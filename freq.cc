@@ -24,6 +24,7 @@
 
 #include <string>
 #include <iostream>
+#include <algorithm>
 #include "freq.hh"
 
 
@@ -56,8 +57,7 @@ bool isPrime(int n) {
 
 // primeAtLeast(n)
 //
-// Return the smallest prime number no smaller
-// than `n`.
+// Return the smallest prime number >=n
 //
 int primeAtLeast(int n) {
   if (n <= 2) {
@@ -119,6 +119,11 @@ int hashValue(std::string key, int modulus) {
   return hashValue;
 }
 
+// Help function for sort()
+//
+bool cmp(freq::entry a, freq::entry b){
+	return a.count>b.count;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * *
 //
@@ -134,6 +139,31 @@ namespace freq {
 //    * `int freq::getCount(freq::dict*,std::string)`: get the count for a word
 //    * `freq::entry* freq::dumpAndDestroy(freq::dict*)`: get the word counts, sorted by frequency
 //    * `void freq::rehash(freq::dict*)`: expand the hash table
+  //destory(D)
+  //destory the dictionary
+  void destory(dict* D){
+	//free the heap
+	int bucketIndex=0;
+	entry* nextEntry;
+	bucket* bucketP;
+	while(bucketIndex<D->numBuckets){
+		bucketP=&(D->buckets[bucketIndex]);
+		entry* current=bucketP->first;
+		entry* nextEntry=current;
+		while(nextEntry!=nullptr){
+			nextEntry=current->next;
+			delete current;
+			current=nextEntry;
+		}
+	bucketIndex++;
+	}
+	D->numIncrements=0;
+	D->numBuckets=0;
+	D->numEntries=0;
+	D->loadFactor=0;
+	delete D->buckets;
+
+  }
   // buildBuckets(howMany):
   //
   // Return an array of buckets of length `howMany`.
@@ -183,7 +213,19 @@ namespace freq {
   // Gets the count associated with the word `w` in `D`.
   //
   int getCount(dict* D, std::string w) {
-    // UNIMPLEMENTED
+	int index=hashValue(w,D->numBuckets);
+	bucket* bkt;
+	entry* current;
+	bkt=&(D->buckets[index]);
+	current=bkt->first;
+	while(current!=nullptr){
+		if(current->word==w){
+			return current->count;
+		}
+		else{
+			current=current->next;
+		}
+	}
     return 0;
   }
 
@@ -193,8 +235,43 @@ namespace freq {
   // that new structure.
   //
   void rehash(dict* D) {
-    // UNIMPLEMENTED
-    return;
+    // create a roughly double sized array
+	int newSize=primeAtLeast(2*D->numBuckets);
+	bucket* newBuckets = buildBuckets(newSize);
+	//move each entry
+	int bucketIndex=0;
+	int counter=0;
+	entry* current;
+	bucket* bucketP;
+	while(bucketIndex<D->numBuckets){
+		bucketP=&(D->buckets[bucketIndex]);
+		entry* target=bucketP->first;
+		while(target!=nullptr){
+			//recalculate the hash value
+			int hash=hashValue(target->word,newSize);
+			//move the entry
+			//if the bucket is empty
+			if(newBuckets[hash].first==nullptr){
+				newBuckets[hash].first=target;
+			}
+			//else find the end of the bucket
+			else{
+				entry* current2=newBuckets[hash].first;
+				while(current2->next!=nullptr){
+					current2=current2->next;
+				}
+				current2->next=target;
+				bucketP->first=target->next;
+				target->next=nullptr;
+			}
+		}
+	bucketIndex++;
+	}
+
+	//Delete the old array
+	delete[] D->buckets;
+    D->numBuckets=newSize;//change numBuckets
+	D->buckets=newBuckets;//replace 
   }
 
   // increment(D,w):
@@ -203,8 +280,44 @@ namespace freq {
   // creating a new entry.
   //
   void increment(dict* D, std::string w) {
-    // UNIMPLEMENTED
-    return;
+	int index=hashValue(w,D->numBuckets);
+	bool change= false;
+	bucket* bkt;//the target bucket
+	entry* current;//the entry
+	entry* follower;
+	bkt=&(D->buckets[index]);
+	current=bkt->first;
+	follower=current;
+
+	//try to find the word
+	while(current!=nullptr){
+		if(current->word==w){
+			current->count=current->count++;
+			change=true;
+			break;
+		}
+		else{
+			current=current->next;
+			follower=current;
+		}
+	}
+	//if can't find the word, create it
+	if(change==false){
+		entry* newWord = new entry;
+		newWord->word=w;
+		newWord->count=1;
+		newWord->next=nullptr;
+
+		//if there is at least 1 entry
+		if(follower!=nullptr){
+			follower->next=newWord;
+		}
+		//if there is no entry
+		else{
+			bkt->first=newWord;
+		}
+	}
+
   }
 
   // dumpAndDestroy(D):
@@ -215,18 +328,29 @@ namespace freq {
   // Deletes all the heap-allocated components of `D`.
   //
   entry* dumpAndDestroy(dict* D) {
-    // UNIMPLEMENTED
-    entry* es = new entry[3];
-    es[0].word = "hello";
-    es[0].count = 0;
-    es[0].next = nullptr;
-    es[1].word = "world";
-    es[1].count = 1;
-    es[1].next = nullptr;
-    es[2].word = "!";
-    es[2].count = 2;
-    es[2].next = nullptr;
-    return es;
+    // get out every entry
+	entry* dumpArray = new entry[D->numEntries];
+	int bucketIndex=0;
+	int counter=0;
+	entry* current;
+	bucket* bucketP;
+	while(bucketIndex<D->numBuckets){
+		bucketP=&(D->buckets[bucketIndex]);
+		current=bucketP->first;
+		while(current!=nullptr){
+			dumpArray[counter]=*current;
+			current=current->next;
+			counter++;
+		}
+	bucketIndex++;
+	}
+	// sort decresingly
+	std::sort(dumpArray,dumpArray+(D->numEntries),cmp);
+	// destory
+	destory(D);
+	return dumpArray;
   }
+
+
 } // end namespace freq
 
