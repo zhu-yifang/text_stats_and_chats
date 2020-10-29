@@ -288,17 +288,18 @@ namespace freq {
 	bkt=&(D->buckets[index]);
 	current=bkt->first;
 	follower=current;
+	D->numIncrements++;
 
 	//try to find the word
 	while(current!=nullptr){
 		if(current->word==w){
-			current->count=current->count++;
+			current->count++;
 			change=true;
 			break;
 		}
 		else{
-			current=current->next;
 			follower=current;
+			current=current->next;
 		}
 	}
 	//if can't find the word, create it
@@ -307,7 +308,7 @@ namespace freq {
 		newWord->word=w;
 		newWord->count=1;
 		newWord->next=nullptr;
-
+		D->numEntries++;
 		//if there is at least 1 entry
 		if(follower!=nullptr){
 			follower->next=newWord;
@@ -345,7 +346,24 @@ namespace freq {
 	bucketIndex++;
 	}
 	// sort decresingly
-	std::sort(dumpArray,dumpArray+(D->numEntries),cmp);
+	//std::sort(dumpArray,dumpArray+(D->numEntries),cmp);
+	
+	for(int i=0;i<D->numEntries;i++){
+		int j=i;
+		int max=j;
+		while(j<D->numEntries){
+			if(dumpArray[max].count<=dumpArray[j].count){
+				max=j;
+			}
+			j++;
+		}
+		//swap
+		entry temp;
+		temp=dumpArray[i];
+		dumpArray[i]=dumpArray[max];
+		dumpArray[max]=temp;
+	}
+	
 	// destory
 	destory(D);
 	return dumpArray;
