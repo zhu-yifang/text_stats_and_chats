@@ -17,8 +17,15 @@ namespace gram {
     struct gram* next;    // Another entry in this dictionary.
   };
 
+  // bucket
+  struct bucket{
+  	gram* first;
+  };
+
   struct dict {
     // UNIMPLEMENTED, but could use the structs defined above, somehow.
+	bucket* buckets; // An pointer to the bucket array
+	int numBuckets;
   };
 
   dict* build(void);

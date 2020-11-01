@@ -88,7 +88,28 @@ gram::dict* train_chat(void) {
 // no longer than `lineWidth` characters.
 //
 void chat(gram::dict* d, int lineWidth, int numLines) {
-  // UNIMPLEMENTED. Does nothing.
+	//pick the first word
+	std::string w1= gram::get(d,".");
+	std::string w2;
+	std::string w;
+	for(int i=0;i<numLines;i++){
+		for(int j=0;j<lineWidth;i++){
+			if(i==0 && j==0){
+				w=gram::get(d,w1);
+				w2=w;
+				std::cout << w;
+			}
+			else if(i==numLines-1 && j==lineWidth-1){
+				std::cout << ".";
+			}
+			else{
+				w=gram::get(d,w1,w2);
+				std::cout << w;
+				w1=w2;
+				w2=w;
+			}
+		}
+	}
 }
 
 // main()
