@@ -236,8 +236,11 @@ namespace freq {
   //
   void rehash(dict* D) {
     // create a roughly double sized array
+
 	int newSize=primeAtLeast(2*D->numBuckets);
+
 	bucket* newBuckets = buildBuckets(newSize);
+
 	//move each entry
 	int bucketIndex=0;
 	int counter=0;
@@ -246,6 +249,7 @@ namespace freq {
 	while(bucketIndex<D->numBuckets){
 		bucketP=&(D->buckets[bucketIndex]);
 		entry* target=bucketP->first;
+		entry* pre = target;
 		while(target!=nullptr){
 			//recalculate the hash value
 			int hash=hashValue(target->word,newSize);
@@ -253,6 +257,8 @@ namespace freq {
 			//if the bucket is empty
 			if(newBuckets[hash].first==nullptr){
 				newBuckets[hash].first=target;
+				pre=target->next;
+				target->next=nullptr;
 			}
 			//else find the end of the bucket
 			else{
@@ -261,16 +267,17 @@ namespace freq {
 					current2=current2->next;
 				}
 				current2->next=target;
-				bucketP->first=target->next;
+				pre=target->next;
 				target->next=nullptr;
 			}
+			target=pre;
 		}
 	bucketIndex++;
 	}
 
 	//Delete the old array
 	delete[] D->buckets;
-    D->numBuckets=newSize;//change numBuckets
+	D->numBuckets=newSize;
 	D->buckets=newBuckets;//replace 
   }
 
@@ -280,6 +287,11 @@ namespace freq {
   // creating a new entry.
   //
   void increment(dict* D, std::string w) {
+	D->numIncrements++;
+	//check loadfactor
+	if(D->numEntries/D->numBuckets>=D->loadFactor){
+		rehash(D);
+	}
 	int index=hashValue(w,D->numBuckets);
 	bool change= false;
 	bucket* bkt;//the target bucket
@@ -288,7 +300,8 @@ namespace freq {
 	bkt=&(D->buckets[index]);
 	current=bkt->first;
 	follower=current;
-	D->numIncrements++;
+
+	
 
 	//try to find the word
 	while(current!=nullptr){

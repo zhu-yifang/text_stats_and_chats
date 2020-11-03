@@ -90,25 +90,30 @@ gram::dict* train_chat(void) {
 void chat(gram::dict* d, int lineWidth, int numLines) {
 	//pick the first word
 	std::string w1= gram::get(d,".");
+	//std::cout << "zero word: ";
+	std::cout << w1 << std::endl;
 	std::string w2;
 	std::string w;
 	for(int i=0;i<numLines;i++){
-		for(int j=0;j<lineWidth;i++){
+		for(int j=0;j<lineWidth;j++){
 			if(i==0 && j==0){
 				w=gram::get(d,w1);
 				w2=w;
-				std::cout << w;
+				//std::cout << "first word: ";
+				std::cout << w << " ";
 			}
-			else if(i==numLines-1 && j==lineWidth-1){
-				std::cout << ".";
-			}
+			//else if(i==numLines-1 && j==lineWidth-1){
+			//	std::cout << ".";
+			//}
 			else{
 				w=gram::get(d,w1,w2);
-				std::cout << w;
+				//std::cout << "second word: ";
+				std::cout << w << " ";
 				w1=w2;
 				w2=w;
 			}
 		}
+		std::cout << std::endl;
 	}
 }
 
@@ -125,8 +130,10 @@ int main(int argc, char **argv) {
   //
   // Build a dictionary of word/bigram followers based on the text entered.
   std::cout << "READING text from STDIN. Hit ctrl-d when done entering text.\n";
-
+  std::cout << "Before train.\n";
   gram::dict* d = train_chat();
+  gram::print(d);
+  std::cout << "Before chat.\n";
   chat(d,60,20);
 }
     

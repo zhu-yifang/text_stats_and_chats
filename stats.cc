@@ -144,6 +144,7 @@ int main(int argc, char **argv) {
   }
   std::cout << std::endl;
   std::cout << "Among its "<< numWords << " words, " << (numWords-count) << " of them appear exactly once." << std::endl;
+
 }
     
 
