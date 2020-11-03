@@ -33,6 +33,7 @@ namespace gram {
   void add(dict* d, std::string w1, std::string w2, std::string fw);
   std::string get(dict* d, std::string k1, std::string k2);
   std::string get(dict* d, std::string k);
+  void print(dict* d);
 }
 
 #endif // _GRAM_H

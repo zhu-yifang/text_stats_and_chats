@@ -115,12 +115,25 @@ namespace gram {
 	int index=hashValue(ws,D->numBuckets);//get the hash value of ws
 	bucket* bucketP = &(D->buckets[index]);
 	gram* current=bucketP->first;
+	//if there is nothing in the bucket
+	if(current==nullptr){
+		//std::cout << "nothing in the bucket[" << index << "]\n";
+		gram* newG = new gram;
+		newG->words=ws;
+		newG->number=1;
+		newG->followers=newF;
+		newG->next=nullptr;
+		bucketP->first=newG;
+		return;
+	}
+	//find the word or find the last thing
 	while(current->words!=ws && current->next!=nullptr){
 		current=current->next;
 	}
 	// if find it, then add fw to the end
 	if(current->words==ws){
-		//find the end of gram
+		//std::cout << "find ws\n";
+		//find the last follower
 		follower* fol = current->followers;
 		while(fol->next!=nullptr){
 			fol=fol->next;
@@ -129,11 +142,16 @@ namespace gram {
 	}
 	// if can't find ws, create a new gram and add fw
   	else{
+		//if(current->next==nullptr){
+		//	std::cout << "current->next is null\n";
+		//}
+		//std::cout << "can't find ws\n";
 		gram* newG = new gram;
 		newG->words=ws;
 		newG->number=1;
 		newG->next=nullptr;
 		newG->followers=newF;
+		current->next=newG;
 	}
   }
   
@@ -144,5 +162,25 @@ namespace gram {
   void destroy(dict *D) {
     delete D;
   }
+
+void print(dict* D){
+	for(int i=0;i<D->numBuckets;i++){
+		std::cout << "bucket[" << i << "]: \n";
+		gram* currentG=D->buckets[i].first;
+		//print the each gram and its followers
+		while(currentG!=nullptr){
+			std::cout << currentG->words << ": " ;
+			follower* currentF= currentG->followers;
+			//print every follower
+			while(currentF!=nullptr){
+				std::cout << currentF->word << ", ";
+				currentF=currentF->next;
+			}
+			currentG=currentG->next;
+			std::cout << std::endl;
+		}
+	}
+}
+
 } 
 
