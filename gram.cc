@@ -117,7 +117,9 @@ namespace gram {
 	gram* current=bucketP->first;
 	//if there is nothing in the bucket
 	if(current==nullptr){
-		//std::cout << "nothing in the bucket[" << index << "]\n";
+		std::cout << "1.Create first gram in bucket " << index << " and add\
+		gram:\""<< ws << "\", and follower:\""<<fw<< "\"\n";
+
 		gram* newG = new gram;
 		newG->words=ws;
 		newG->number=1;
@@ -139,13 +141,15 @@ namespace gram {
 			fol=fol->next;
 		}
 		fol->next=newF;
+		std::cout << "2.Don't create new gram in bucket " << index << " and add\
+		gram:\""<< ws << "\", and follower:\""<<fw<< "\"\n";
+
 	}
 	// if can't find ws, create a new gram and add fw
   	else{
-		//if(current->next==nullptr){
-		//	std::cout << "current->next is null\n";
-		//}
-		//std::cout << "can't find ws\n";
+		std::cout << "3.Create not first gram in bucket " << index << " and add\
+		gram:\""<< ws << "\", and follower:\""<<fw<< "\"\n";
+
 		gram* newG = new gram;
 		newG->words=ws;
 		newG->number=1;
@@ -164,6 +168,7 @@ namespace gram {
   }
 
 void print(dict* D){
+	int counter=0;
 	for(int i=0;i<D->numBuckets;i++){
 		std::cout << "bucket[" << i << "]: \n";
 		gram* currentG=D->buckets[i].first;
@@ -175,11 +180,13 @@ void print(dict* D){
 			while(currentF!=nullptr){
 				std::cout << currentF->word << ", ";
 				currentF=currentF->next;
+				counter++;
 			}
 			currentG=currentG->next;
 			std::cout << std::endl;
 		}
 	}
+	std::cout << "There are "<< counter <<" followers.\n";
 }
 
 } 

@@ -76,8 +76,9 @@ gram::dict* train_chat(void) {
       w2 = w;
     }
   }
+  std::cout << "LAST: "<< w1 << " " << w2 << std::endl;
   gram::add(d,w1,w2);       // Add the last word as a follower.
-  gram::add(d,w1,w2,".");   // Include the last word as preceding a stopper `.`.
+  //gram::add(d,w1,w2,".");   // Include the last word as preceding a stopper `.`.
   return d;
 }
 
@@ -101,9 +102,9 @@ void chat(gram::dict* d, int lineWidth, int numLines) {
 				//std::cout << "first word: ";
 				std::cout << w << " ";
 			}
-			//else if(i==numLines-1 && j==lineWidth-1){
-			//	std::cout << ".";
-			//}
+			else if(i==numLines-1 && j==lineWidth-1){
+				std::cout << ".";
+			}
 			else{
 				w=gram::get(d,w1,w2);
 				//std::cout << "second word: ";
