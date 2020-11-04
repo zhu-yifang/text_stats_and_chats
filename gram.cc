@@ -117,8 +117,6 @@ namespace gram {
 	gram* current=bucketP->first;
 	//if there is nothing in the bucket
 	if(current==nullptr){
-		std::cout << "1.Create first gram in bucket " << index << " and add\
-		gram:\""<< ws << "\", and follower:\""<<fw<< "\"\n";
 
 		gram* newG = new gram;
 		newG->words=ws;
@@ -134,21 +132,15 @@ namespace gram {
 	}
 	// if find it, then add fw to the end
 	if(current->words==ws){
-		//std::cout << "find ws\n";
-		//find the last follower
 		follower* fol = current->followers;
 		while(fol->next!=nullptr){
 			fol=fol->next;
 		}
 		fol->next=newF;
-		std::cout << "2.Don't create new gram in bucket " << index << " and add\
-		gram:\""<< ws << "\", and follower:\""<<fw<< "\"\n";
 
 	}
 	// if can't find ws, create a new gram and add fw
   	else{
-		std::cout << "3.Create not first gram in bucket " << index << " and add\
-		gram:\""<< ws << "\", and follower:\""<<fw<< "\"\n";
 
 		gram* newG = new gram;
 		newG->words=ws;
